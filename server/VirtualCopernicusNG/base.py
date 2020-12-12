@@ -7,7 +7,7 @@ from gpiozero.pins.mock import MockFactory, MockTriggerPin, MockPWMPin, MockChar
 
 class TkDevice():
     _images = {}
-    
+
     def __init__(self, root, x, y, name):
         self._root = root
         self._name = name
@@ -18,16 +18,16 @@ class TkDevice():
 
     def _redraw(self):
         self._root.update()
-    
+
     def _create_main_widget(self, widget_class, initial_state=None):
         self._widget = widget_class(self._root)
         self._widget.place(x=self._x, y=self._y)
-        
+
         if initial_state != None:
             self._change_widget_image(initial_state)
-        
+
         return self._widget
-    
+
     def _set_image_for_state(self, image_file_name, state, dimensions=None):
         if image_file_name in TkDevice._images:
             image = TkDevice._images[image_file_name]
@@ -38,13 +38,13 @@ class TkDevice():
             image = Image.open(file_path)
             if dimensions != None:
                 image = image.resize(dimensions, Image.ANTIALIAS)
-            
+
             TkDevice._images[image_file_name] = image
-            
+
         self._image_states[state] = image
-        
+
         return image
-        
+
     def _change_widget_image(self, image_or_state):
         if self._widget != None:
             if isinstance(image_or_state, str):
@@ -52,10 +52,10 @@ class TkDevice():
                 image = self._image_states[state]
             else:
                 image = image_or_state
-        
+
             self._photo_image = ImageTk.PhotoImage(image)
             self._widget.configure(image=self._photo_image)
-        
+
             self._redraw()
 
 
@@ -63,37 +63,37 @@ class PreciseMockTriggerPin(MockTriggerPin, MockPWMPin):
     def _echo(self):
         sleep(0.001)
         self.echo_pin.drive_high()
-        
+
         # sleep(), time() and monotonic() dont have enough precision!
         init_time = perf_counter()
         while True:
             if perf_counter() - init_time >= self.echo_time:
                 break
-        
+
         self.echo_pin.drive_low()
-        
-        
+
+
 class PreciseMockFactory(MockFactory):
     @staticmethod
     def ticks():
         # time() and monotonic() dont have enough precision!
         return perf_counter()
-    
+
 
 class PreciseMockChargingPin(MockChargingPin, MockPWMPin):
-    
+
     def _charge(self):
         init_time = perf_counter()
         while True:
             if perf_counter() - init_time >= self.charge_time:
                 break
-        
+
         try:
             self.drive_high()
         except AssertionError:
             pass
     pass
-    
+
 
 class SingletonMeta(type):
     _instances = {}

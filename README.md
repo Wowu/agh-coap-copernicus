@@ -1,5 +1,37 @@
 # agh-coap-copernicus
+
 CoAP server for VirtualCopernicus provided GPIO
+
+## Requirements
+
+- Python 3.7
+- virtualenvwrapper (optional)
+
+## Installation
+
+With virtualenvwrapper installed:
+
+```bash
+mkvirtualenv agh-coap-copernicus
+pip install -r requirements.txt
+```
+
+## Running
+
+```bash
+workon agh-coap-copernicus
+python server/server.py virtual
+python server/client.py
+```
+
+## Adding new dependencies
+
+```bash
+pip install <name>
+pip freeze > requirements.txt
+```
+
+# TODO
 
 ## Research
 1. Ogarnąć jak działają zasoby w CoAPie
