@@ -16,6 +16,11 @@ mkvirtualenv agh-coap-copernicus
 pip install -r requirements.txt
 ```
 
+It may be required to install `portaudio` library in system:
+```bash
+apt install libportaudio2
+```
+
 ## Running
 
 ```bash
