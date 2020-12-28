@@ -15,6 +15,7 @@ configuration = {
         {"x": 295, "y": 170, "name": "Button 2", "pin": 12},
     ],
     "buzzers": [
-        {"x": 277, "y": 9, "name": "Buzzer", "pin": 16, "frequency": 440},
+        {"x": 277, "y": 9, "name": "Buzzer 1", "pin": 16, "frequency": 440},
+        {"x": 277, "y": 50, "name": "Buzzer 2", "pin": 15, "frequency": 700},
     ]
 }

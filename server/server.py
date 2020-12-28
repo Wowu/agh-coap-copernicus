@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from gpiozero import LED, Button, AngularServo
+from gpiozero import LED, Button, AngularServo, OutputDevice, AnalogInputDevice, Buzzer
 from VirtualCopernicusNG import TkCircuit
 
 import logging
@@ -33,12 +33,13 @@ class ServoResource(resource.Resource):
         self.resource.angle = default_angle
 
     async def render_get(self, request):
+        print(f'SERVO {self.pin}: GET')
         payload = f"{self.resource.angle}";
         return Message(payload=payload.encode(), code=Code.CONTENT)
 
     async def render_post(self, request):
         payload = request.payload.decode()
-        print(f"render_post payload {payload}")
+        print(f'SERVO {self.pin}: POST {payload}')
         if self.min_angle <= int(payload) <= self.max_angle:
             self.resource.angle = int(payload)
             return Message(code=Code.CHANGED)
@@ -54,28 +55,95 @@ class LEDResource(resource.Resource):
 
     def __init__(self, pin):
         super().__init__()
-
         self.handle = None
-
         self.pin = pin
         self.resource = LED(pin)
 
     async def render_get(self, request):
-        payload = f"{self.resource.value}";
+        payload = f"{self.resource.value}"
+        print(f'LED {self.pin}: GET')
         return Message(payload=payload.encode(), code=Code.CONTENT)
 
     async def render_post(self, request):
         payload = request.payload.decode()
-        print(f"render_post payload {payload}")
-        new_state = int(payload)
-        if new_state == 0:
+        print(f'LED {self.pin}: POST {payload}')
+        if payload in ['0', 'off']:
             self.resource.off()
-        elif new_state == 1:
+        elif payload in ['1', 'on']:
+            self.resource.on()
+        elif payload in ['-1', 'toggle']:
+            self.resource.toggle()
+        elif 'blink' in payload:
+            p = payload.split(" ")
+            if p[0] != 'blink':
+                return Message(code=Code.BAD_REQUEST)
+            on_time, off_time, n = 1, 1, None
+            if len(p) > 1 and p[1].isdigit():
+                on_time = int(p[1])
+            if len(p) > 2 and p[2].isdigit():
+                off_time = int(p[2])
+            if len(p) > 3 and p[3].isdigit():
+                n = int(p[3])
+            self.resource.blink(on_time, off_time, n)
+        else:
+            return Message(code=Code.BAD_REQUEST)
+        return Message(code=Code.CHANGED)
+
+
+class GPIOResource(resource.Resource):
+
+    def get_link_description(self):
+        # Publish additional data in .well-known/core
+        return dict(**super().get_link_description(), title=f"GPIO Resource - pin: {self.pin}")
+
+    def __init__(self, pin):
+        super().__init__()
+
+        self.handle = None
+
+        self.pin = pin
+        self.resource = OutputDevice(pin)
+
+    async def render_get(self, request):
+        print(f'GPIO {self.pin}: GET')
+        payload = f"{self.resource.value}"
+        return Message(payload=payload.encode(), code=Code.CONTENT)
+
+    async def render_post(self, request):
+        payload = request.payload.decode()
+        print(f'GPIO {self.pin}: POST {payload}')
+
+        if payload in ['0', 'off']:
+            self.resource.off()
+        elif payload in ['1', 'on']:
             self.resource.on()
         else:
             return Message(code=Code.BAD_REQUEST)
         return Message(code=Code.CHANGED)
 
+
+class ButtonResource(resource.Resource):
+
+    def get_link_description(self):
+        # Publish additional data in .well-known/core
+        return dict(**super().get_link_description(), title=f"Button Resource - pin: {self.pin}")
+
+    def __init__(self, pin, callback_p=None, callback_r=None):
+        super().__init__()
+
+        self.handle = None
+
+        self.pin = pin
+        self.resource = Button(pin)
+        if callback_p:
+            self.resource.when_pressed = callback_p
+        if callback_r:
+            self.resource.when_released = callback_r
+
+    async def render_get(self, request):
+        print(f'BUTTON {self.pin}: GET')
+        payload = f"{self.resource.value}"
+        return Message(payload=payload.encode(), code=Code.CONTENT)
 
 
 class BuzzerResource(resource.Resource):
@@ -86,24 +154,36 @@ class BuzzerResource(resource.Resource):
 
     def __init__(self, pin):
         super().__init__()
-
         self.handle = None
-
         self.pin = pin
-        self.resource = LED(pin)
+        self.resource = Buzzer(pin)
 
     async def render_get(self, request):
-        payload = f"{self.resource.value}";
+        payload = f"{self.resource.value}"
+        print(f'BUZZER {self.pin}: GET')
         return Message(payload=payload.encode(), code=Code.CONTENT)
 
     async def render_post(self, request):
         payload = request.payload.decode()
-        print(f"render_post payload {payload}")
-        new_state = int(payload)
-        if new_state == 0:
+        print(f'BUZZER {self.pin}: POST {payload}')
+        if payload in ['0', 'off']:
             self.resource.off()
-        elif new_state == 1:
+        elif payload in ['1', 'on']:
             self.resource.on()
+        elif payload in ['-1', 'toggle']:
+            self.resource.toggle()
+        elif 'beep' in payload:
+            p = payload.split(" ")
+            if p[0] != 'beep':
+                return Message(code=Code.BAD_REQUEST)
+            on_time, off_time, n = 1, 1, None
+            if len(p) > 1 and p[1].isdigit():
+                on_time = int(p[1])
+            if len(p) > 2 and p[2].isdigit():
+                off_time = int(p[2])
+            if len(p) > 3 and p[3].isdigit():
+                n = int(p[3])
+            self.resource.beep(on_time, off_time, n)
         else:
             return Message(code=Code.BAD_REQUEST)
         return Message(code=Code.CHANGED)
@@ -127,7 +207,10 @@ def virtual():
         root.add_resource(['servo'], ServoResource(17))
         root.add_resource(['led1'], LEDResource(21))
         root.add_resource(['led2'], LEDResource(22))
+        root.add_resource(['button1'], ButtonResource(11, lambda: print("Button1 pressed")))
+        root.add_resource(['button2'], ButtonResource(12))
         root.add_resource(['buzzer'], BuzzerResource(16))
+        root.add_resource(['gpio_buzzer'], GPIOResource(15))
         asyncio.set_event_loop(event_loop)
         asyncio.Task(Context.create_server_context(root, bind=("127.0.0.1", 5683)))
         event_loop.run_forever()

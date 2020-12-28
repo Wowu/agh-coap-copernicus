@@ -18,7 +18,7 @@ async def get_value(name: str):
     context = await Context.create_client_context()
 
     request = Message(
-        code=aiocoap.GET,
+        code=Code.GET,
         uri=f'coap://127.0.0.1/{name}'
     )
 
@@ -30,7 +30,7 @@ async def get_value(name: str):
         print(e)
 
 
-async def set_angle(name: str, val):
+async def set_value(name: str, val: str):
     context = await Context.create_client_context()
 
     request = Message(
@@ -52,10 +52,9 @@ async def main():
     print("g name - get resource value")
     print("s name v - set resource value to v")
     while True:
-        # user_input = input('> ')
         user_input = input('')
         if user_input == 'e':
-            print("bye")
+            print("Goodbye!")
             break
 
         tokens = user_input.split(' ')
@@ -65,15 +64,10 @@ async def main():
         except:
             params = []
 
-        command = {
-            'g': get_value,
-            's': set_angle
-        }[cmd]
-
-        try:
-            await command(*params)
-        except:
-            pass
+        if cmd == 'g':
+            await get_value(params[0])
+        elif cmd == 's':
+            await set_value(params[0], " ".join(params[1:]))
 
 
 if __name__ == "__main__":
