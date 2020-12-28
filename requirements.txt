@@ -1,9 +1,11 @@
-aiocoap==0.3
+aiocoap==0.4b3
 cffi==1.14.4
 colorzero==1.1
 gpiozero==1.5.1
-numpy==1.19.4
+LinkHeader==0.4.3
+numpy==1.20.0rc2
 Pillow==8.0.1
 pycparser==2.20
-scipy==1.5.4
+scipy==1.6.0rc2
 sounddevice==0.4.1
+
