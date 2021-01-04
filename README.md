@@ -33,7 +33,7 @@ pip freeze > requirements.txt
 ```bash
 workon agh-coap-copernicus
 python server/server.py virtual
-python server/client.py
+python client/client.py
 ```
 
 ## Usage instruction
