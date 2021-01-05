@@ -105,9 +105,9 @@ s <resource_name> <options>
 
 ## Phase 3
 
-- [ ] Próba uruchomienia na Raspberry Pi i nagranie @wowu @def-au1l
+- [ ] Próba uruchomienia na Raspberry Pi i nagranie @wowu @def-au1t
 - [ ] Observable button @rivit98
-- [ ] Przygotować projekt @wowu @def-au1l
+- [ ] Przygotować projekt @wowu @def-au1t
    - [ ] Opisujemy scenariusz - sterownik świateł w oparciu o CoAP
    - [ ] Jest serwer który udostępnia observable button
    - [ ] Jest klient który zapala diodę po kliknięciu buttona
