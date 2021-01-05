@@ -88,10 +88,7 @@ s <resource_name> <options>
 - `blink <on_time> <off_time> <n>` for LED
 
 
-
 ---
-
-
 
 
 # TODO
@@ -101,12 +98,18 @@ s <resource_name> <options>
 
 ~~2. Ogarnąć libkę do serwera CoAP w Pythonie~~
 
+## Phase 2
 ~~3. Ogarnąć jak działa wszystkie 5 wymaganych typów zasobów w gpiozero~~
 
-4. Zobaczyć w jaki sposób podawać implementację gpiozero (virtualcopernicus)
+~~4. Zobaczyć w jaki sposób podawać implementację gpiozero (virtualcopernicus)~~
 
-## Phase 2
-5. Serwer w CoAPie sterujący GPIO
-6. Próba uruchomienia na Raspberry Pi i nagranie(?)
-7. Dokumentacja
-8. Przygotować przykładowe programy
+## Phase 3
+
+- [ ] Próba uruchomienia na Raspberry Pi i nagranie @wowu @def-au1l
+- [ ] Observable button @rivit98
+- [ ] Przygotować projekt @wowu @def-au1l
+   - [ ] Opisujemy scenariusz - sterownik świateł w oparciu o CoAP
+   - [ ] Jest serwer który udostępnia observable button
+   - [ ] Jest klient który zapala diodę po kliknięciu buttona
+   - [ ] Małe sprawozdanie @kuczi55
+- [ ] Dokumentacja (uwzględnić m3 i dostosować rozmiary obrazków) @kuczi55
