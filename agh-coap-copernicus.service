@@ -1,0 +1,13 @@
+[Unit]
+Description=CoAP resource server
+After=network.target
+Wants=network-online.target
+
+[Service]
+Restart=always
+Type=simple
+ExecStart=/home/pi/.virtualenvs/agh-coap-copernicus/bin/python server/server.py gpiozero
+WorkingDirectory=/home/pi/Desktop/agh-coap-copernicus
+
+[Install]
+WantedBy=multi-user.target

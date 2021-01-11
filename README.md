@@ -95,6 +95,22 @@ s <resource_name> <options>
 - `blink <on_time> <off_time> <n>` for LED
 
 
+## Systemd service
+
+Install using the following commands:
+
+```bash
+sudo cp agh-coap-copernicus.service /etc/systemd/system
+sudo systemctl enable agh-coap-copernicus
+sudo systemctl start agh-coap-copernicus
+```
+
+View logs:
+
+```bash
+sudo journalctl -xfu agh-coap-copernicus
+```
+
 ---
 
 
@@ -113,10 +129,11 @@ s <resource_name> <options>
 ## Phase 3
 
 - [ ] Próba uruchomienia na Raspberry Pi i nagranie @wowu @def-au1t
-- [ ] Observable button @rivit98
+- [x] Observable button ~~@rivit98~~ @def-au1t
 - [ ] Przygotować projekt @wowu @def-au1t
    - [ ] Opisujemy scenariusz - sterownik świateł w oparciu o CoAP
    - [ ] Jest serwer który udostępnia observable button
    - [ ] Jest klient który zapala diodę po kliknięciu buttona
    - [ ] Małe sprawozdanie @kuczi55
 - [ ] Dokumentacja (uwzględnić m3 i dostosować rozmiary obrazków) @kuczi55
+  - [ ] Dopisać o systemd
