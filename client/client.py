@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import logging
 import asyncio
 
@@ -49,6 +50,16 @@ async def set_value(name: str, val: str):
 
 
 async def main():
+    global SERVER_IP
+
+    parser = argparse.ArgumentParser(description='Run CoAP Client')
+    parser.add_argument('address', nargs='?', metavar='server_address', type=str,
+                        help='CoAP server address', default="127.0.0.1" )
+
+    args = parser.parse_args()
+    SERVER_IP = args.address
+
+    print(f"CoAP Client - Connected to: {SERVER_IP}")
     print("e - exit")
     print("g name - get resource value")
     print("s name v - set resource value to v")

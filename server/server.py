@@ -15,6 +15,7 @@ from virtual_config import configuration
 logging.basicConfig(level=logging.INFO)
 logging.getLogger("coap-server").setLevel(logging.INFO)
 
+SERVER_IP = '0.0.0.0'
 
 class ServoResource(resource.Resource):
     def get_link_description(self):
@@ -221,7 +222,7 @@ def virtual():
         root.add_resource(['buzzer'], BuzzerResource(16))
         root.add_resource(['gpio_buzzer'], GPIOResource(15))
         asyncio.set_event_loop(event_loop)
-        asyncio.Task(Context.create_server_context(root, bind=("0.0.0.0", 5683)))
+        asyncio.Task(Context.create_server_context(root, bind=(SERVER_IP, 5683)))
         event_loop.run_forever()
 
 
@@ -234,7 +235,7 @@ def physical():
     root.add_resource(['button'], ButtonResource(27, lambda: print("Button pressed")))
 
     asyncio.set_event_loop(event_loop)
-    asyncio.Task(Context.create_server_context(root, bind=("0.0.0.0", 5683)))
+    asyncio.Task(Context.create_server_context(root, bind=(SERVER_IP, 5683)))
     event_loop.run_forever()
 
 
@@ -242,8 +243,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run CoAP server')
     parser.add_argument('device', metavar='device_type', type=str,
                         help='device', choices=['gpiozero', 'virtual'])
+    parser.add_argument('address', nargs='?', metavar='server_address', type=str,
+                        help='CoAP server address', default="0.0.0.0" )
 
     args = parser.parse_args()
+    SERVER_IP = args.address
     event_loop = asyncio.get_event_loop()
 
     # use virtual or gpiozero devices
