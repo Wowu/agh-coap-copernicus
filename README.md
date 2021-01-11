@@ -17,8 +17,15 @@ pip install -r requirements.txt
 ```
 
 It may be required to install `portaudio` library in system:
+
 ```bash
 apt install libportaudio2
+```
+
+On Raspberry pi you may need to install additional dependencies:
+
+```bash
+sudo apt install libatlas3-base
 ```
 
 #### Adding new dependencies
