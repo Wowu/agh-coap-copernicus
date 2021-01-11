@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
-
-from gpiozero import LED, Button, AngularServo, OutputDevice, AnalogInputDevice, Buzzer
-from VirtualCopernicusNG import TkCircuit
-
+import argparse
 import logging
-
 import asyncio
 
+from gpiozero import LED, Button, AngularServo, OutputDevice, AnalogInputDevice, Buzzer
 import aiocoap.resource as resource
 from aiocoap import Code, Context, Message
 
-import argparse
-
+from VirtualCopernicusNG import TkCircuit
 from virtual_config import configuration
 
 
-class ServoResource(resource.Resource):
+# logging setup
+logging.basicConfig(level=logging.INFO)
+logging.getLogger("coap-server").setLevel(logging.INFO)
 
+
+class ServoResource(resource.Resource):
     def get_link_description(self):
         # Publish additional data in .well-known/core
         return dict(**super().get_link_description(), title=f"Servo Resource - pin: {self.pin}")
@@ -48,7 +48,6 @@ class ServoResource(resource.Resource):
 
 
 class LEDResource(resource.Resource):
-
     def get_link_description(self):
         # Publish additional data in .well-known/core
         return dict(**super().get_link_description(), title=f"LED Resource - pin: {self.pin}")
@@ -91,7 +90,6 @@ class LEDResource(resource.Resource):
 
 
 class GPIOResource(resource.Resource):
-
     def get_link_description(self):
         # Publish additional data in .well-known/core
         return dict(**super().get_link_description(), title=f"GPIO Resource - pin: {self.pin}")
@@ -123,7 +121,6 @@ class GPIOResource(resource.Resource):
 
 
 class ButtonResource(resource.Resource):
-
     def get_link_description(self):
         # Publish additional data in .well-known/core
         return dict(**super().get_link_description(), title=f"Button Resource - pin: {self.pin}")
@@ -135,6 +132,7 @@ class ButtonResource(resource.Resource):
 
         self.pin = pin
         self.resource = Button(pin)
+
         if callback_p:
             self.resource.when_pressed = callback_p
         if callback_r:
@@ -147,7 +145,6 @@ class ButtonResource(resource.Resource):
 
 
 class BuzzerResource(resource.Resource):
-
     def get_link_description(self):
         # Publish additional data in .well-known/core
         return dict(**super().get_link_description(), title=f"Buzzer Resource - pin: {self.pin}")
@@ -189,13 +186,8 @@ class BuzzerResource(resource.Resource):
         return Message(code=Code.CHANGED)
 
 
-# logging setup
-
-logging.basicConfig(level=logging.INFO)
-logging.getLogger("coap-server").setLevel(logging.INFO)
-
-
 def virtual():
+    """Simulate coap resources in VirtualCopernicus"""
     event_loop = asyncio.get_event_loop()
     circuit = TkCircuit(configuration)
 
@@ -212,25 +204,35 @@ def virtual():
         root.add_resource(['buzzer'], BuzzerResource(16))
         root.add_resource(['gpio_buzzer'], GPIOResource(15))
         asyncio.set_event_loop(event_loop)
-        asyncio.Task(Context.create_server_context(root, bind=("127.0.0.1", 5683)))
+        asyncio.Task(Context.create_server_context(root, bind=("0.0.0.0", 5683)))
         event_loop.run_forever()
+
+
+def physical():
+    """Run coap resources on real raspberry pi"""
+    event_loop = asyncio.get_event_loop()
+
+    root = resource.Site()
+    root.add_resource(['.well-known', 'core'],
+                        resource.WKCResource(root.get_resources_as_linkheader))
+    root.add_resource(['led'], LEDResource(21))
+    root.add_resource(['button'], ButtonResource(11, lambda: print("Button1 pressed")))
+
+    asyncio.set_event_loop(event_loop)
+    asyncio.Task(Context.create_server_context(root, bind=("0.0.0.0", 5683)))
+    event_loop.run_forever()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run CoAP server')
-    parser.add_argument('device',
-                        metavar='device_type',
-                        type=str,
-                        # nargs=1,
-                        help='device',
-                        choices=['gpiozero', 'virtual']
-                        )
+    parser.add_argument('device', metavar='device_type', type=str,
+                        help='device', choices=['gpiozero', 'virtual'])
 
     args = parser.parse_args()
 
-    if args.device == 'gpiozero':  # use virtual or gpiozero devices
-        pass
+    # use virtual or gpiozero devices
+    if args.device == 'gpiozero':
+        physical()
     elif args.device == 'virtual':
         virtual()
 
-# TODO: add proper application closing
