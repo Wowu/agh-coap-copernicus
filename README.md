@@ -137,3 +137,5 @@ sudo journalctl -xfu agh-coap-copernicus
    - [ ] Małe sprawozdanie @kuczi55
 - [ ] Dokumentacja (uwzględnić m3 i dostosować rozmiary obrazków) @kuczi55
   - [ ] Dopisać o systemd
+
+@wowu Tue Jan 12 00:17:49 2021: Dodałem plik `lab.md` który zawiera wstęp do laboratorium.
