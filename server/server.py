@@ -120,7 +120,9 @@ class GPIOResource(resource.Resource):
         return Message(code=Code.CHANGED)
 
 
-class ButtonResource(resource.Resource):
+class ButtonResource(resource.ObservableResource):
+    global event_loop
+
     def get_link_description(self):
         # Publish additional data in .well-known/core
         return dict(**super().get_link_description(), title=f"Button Resource - pin: {self.pin}")
@@ -132,11 +134,27 @@ class ButtonResource(resource.Resource):
 
         self.pin = pin
         self.resource = Button(pin)
+        self.callback_p = callback_p
+        self.callback_r = callback_r
 
-        if callback_p:
-            self.resource.when_pressed = callback_p
-        if callback_r:
-            self.resource.when_released = callback_r
+        self.resource.when_pressed = self.on_pressed
+        self.resource.when_released = self.on_released
+
+    def on_pressed(self):
+        event_loop.call_soon_threadsafe(self.on_pressed_callback)
+
+    def on_released(self):
+        event_loop.call_soon_threadsafe(self.on_released_callback)
+
+    def on_pressed_callback(self):
+        self.updated_state()
+        if self.callback_p:
+            self.callback_p()
+
+    def on_released_callback(self):
+        self.updated_state()
+        if self.callback_r:
+            self.callback_r()
 
     async def render_get(self, request):
         print(f'BUTTON {self.pin}: GET')
@@ -188,7 +206,6 @@ class BuzzerResource(resource.Resource):
 
 def virtual():
     """Simulate coap resources in VirtualCopernicus"""
-    event_loop = asyncio.get_event_loop()
     circuit = TkCircuit(configuration)
 
     @circuit.run
@@ -210,8 +227,6 @@ def virtual():
 
 def physical():
     """Run coap resources on real raspberry pi"""
-    event_loop = asyncio.get_event_loop()
-
     root = resource.Site()
     root.add_resource(['.well-known', 'core'],
                         resource.WKCResource(root.get_resources_as_linkheader))
@@ -229,6 +244,7 @@ if __name__ == "__main__":
                         help='device', choices=['gpiozero', 'virtual'])
 
     args = parser.parse_args()
+    event_loop = asyncio.get_event_loop()
 
     # use virtual or gpiozero devices
     if args.device == 'gpiozero':
