@@ -8,6 +8,7 @@ from aiocoap import Context, Message, Code
 
 logging.basicConfig(level=logging.INFO)
 
+SERVER_IP = "127.0.0.1"
 
 def format_response(code, payload):
     print(f"Response: {code}")
@@ -19,7 +20,7 @@ async def get_value(name: str):
 
     request = Message(
         code=Code.GET,
-        uri=f'coap://127.0.0.1/{name}'
+        uri=f'coap://{SERVER_IP}/{name}'
     )
 
     try:
@@ -35,7 +36,7 @@ async def set_value(name: str, val: str):
 
     request = Message(
         code=Code.POST,
-        uri=f'coap://127.0.0.1/{name}',
+        uri=f'coap://{SERVER_IP}/{name}',
         payload=str(val).encode()
     )
 
