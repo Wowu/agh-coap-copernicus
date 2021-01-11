@@ -215,8 +215,8 @@ def physical():
     root = resource.Site()
     root.add_resource(['.well-known', 'core'],
                         resource.WKCResource(root.get_resources_as_linkheader))
-    root.add_resource(['led'], LEDResource(21))
-    root.add_resource(['button'], ButtonResource(11, lambda: print("Button1 pressed")))
+    root.add_resource(['led'], LEDResource(17))
+    root.add_resource(['button'], ButtonResource(27, lambda: print("Button pressed")))
 
     asyncio.set_event_loop(event_loop)
     asyncio.Task(Context.create_server_context(root, bind=("0.0.0.0", 5683)))
