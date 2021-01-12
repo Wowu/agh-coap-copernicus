@@ -229,7 +229,7 @@ def physical():
     root.add_resource(['.well-known', 'core'],
                       resource.WKCResource(root.get_resources_as_linkheader))
     root.add_resource(['led'], LEDResource(17))
-    root.add_resource(['buzzer'], BuzzerResource(22, active_high=False, initial_value=True))
+    root.add_resource(['buzzer'], BuzzerResource(22, active_high=False))
     root.add_resource(['button'], ButtonResource(27, lambda: print("Button pressed")))
 
     asyncio.set_event_loop(event_loop)
