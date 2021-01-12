@@ -168,11 +168,11 @@ class BuzzerResource(resource.Resource):
         # Publish additional data in .well-known/core
         return dict(**super().get_link_description(), title=f"Buzzer Resource - pin: {self.pin}")
 
-    def __init__(self, pin):
+    def __init__(self, pin, active_high=True, initial_value=False):
         super().__init__()
         self.handle = None
         self.pin = pin
-        self.resource = Buzzer(pin)
+        self.resource = Buzzer(pin, active_high=active_high, initial_value=initial_value)
 
     async def render_get(self, request):
         payload = f"{self.resource.value}"
@@ -232,6 +232,7 @@ def physical():
     root.add_resource(['.well-known', 'core'],
                         resource.WKCResource(root.get_resources_as_linkheader))
     root.add_resource(['led'], LEDResource(17))
+    root.add_resource(['buzzer'], BuzzerResource(22, active_high=False, initial_value=True))
     root.add_resource(['button'], ButtonResource(27, lambda: print("Button pressed")))
 
     asyncio.set_event_loop(event_loop)
