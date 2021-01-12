@@ -86,9 +86,9 @@ class LEDResource(resource.Resource):
                 n = int(p[3])
 
             self.resource.blink(on_time, off_time, n)
-
-        return Message(code=Code.BAD_REQUEST)
-
+        else:
+            return Message(code=Code.BAD_REQUEST)
+        return Message(code=Code.CHANGED)
 
 class GPIOResource(resource.Resource):
     def get_link_description(self):
@@ -114,8 +114,9 @@ class GPIOResource(resource.Resource):
             self.resource.off()
         elif payload in ['1', 'on']:
             self.resource.on()
-
-        return Message(code=Code.BAD_REQUEST)
+        else:
+            return Message(code=Code.BAD_REQUEST)
+        return Message(code=Code.CHANGED)
 
 
 class ButtonResource(resource.ObservableResource):
@@ -197,9 +198,9 @@ class BuzzerResource(resource.Resource):
                 n = int(p[3])
 
             self.resource.beep(on_time, off_time, n)
-
-        return Message(code=Code.BAD_REQUEST)
-
+        else:
+            return Message(code=Code.BAD_REQUEST)
+        return Message(code=Code.CHANGED)
 
 def virtual():
     """Simulate coap resources in VirtualCopernicus"""
