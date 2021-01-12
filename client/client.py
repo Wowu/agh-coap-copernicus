@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
 
 import argparse
-import logging
 import asyncio
 
-import aiocoap
 from aiocoap import Context, Message, Code
-
-logging.basicConfig(level=logging.INFO)
 
 SERVER_IP = "127.0.0.1"
 
 def format_response(code, payload):
     print(f"Response: {code}")
-    print(payload.decode('utf-8'))
+    if len(payload) > 0:
+        print(payload.decode('utf-8'))
 
 
 async def get_value(name: str):
@@ -73,13 +70,12 @@ async def main():
         cmd = tokens[0]
         try:
             params = tokens[1:]
+            if cmd == 'g':
+                await get_value(params[0])
+            elif cmd == 's':
+                await set_value(params[0], " ".join(params[1:]))
         except:
-            params = []
-
-        if cmd == 'g':
-            await get_value(params[0])
-        elif cmd == 's':
-            await set_value(params[0], " ".join(params[1:]))
+            print("Bad command")
 
 
 if __name__ == "__main__":

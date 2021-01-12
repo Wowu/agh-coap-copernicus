@@ -3,19 +3,19 @@ import argparse
 import logging
 import asyncio
 
-from gpiozero import LED, Button, AngularServo, OutputDevice, AnalogInputDevice, Buzzer
+from gpiozero import LED, Button, AngularServo, OutputDevice, Buzzer
 import aiocoap.resource as resource
 from aiocoap import Code, Context, Message
 
 from VirtualCopernicusNG import TkCircuit
 from virtual_config import configuration
 
-
 # logging setup
 logging.basicConfig(level=logging.INFO)
 logging.getLogger("coap-server").setLevel(logging.INFO)
 
 SERVER_IP = '0.0.0.0'
+
 
 class ServoResource(resource.Resource):
     def get_link_description(self):
@@ -25,8 +25,6 @@ class ServoResource(resource.Resource):
     def __init__(self, pin, min_angle=-90, max_angle=90, default_angle=0):
         super().__init__()
 
-        self.handle = None
-
         self.pin = pin
         self.min_angle = min_angle
         self.max_angle = max_angle
@@ -35,7 +33,7 @@ class ServoResource(resource.Resource):
 
     async def render_get(self, request):
         print(f'SERVO {self.pin}: GET')
-        payload = f"{self.resource.angle}";
+        payload = f"{self.resource.angle}"
         return Message(payload=payload.encode(), code=Code.CONTENT)
 
     async def render_post(self, request):
@@ -44,8 +42,8 @@ class ServoResource(resource.Resource):
         if self.min_angle <= int(payload) <= self.max_angle:
             self.resource.angle = int(payload)
             return Message(code=Code.CHANGED)
-        else:
-            return Message(code=Code.BAD_REQUEST)
+
+        return Message(code=Code.BAD_REQUEST)
 
 
 class LEDResource(resource.Resource):
@@ -55,7 +53,7 @@ class LEDResource(resource.Resource):
 
     def __init__(self, pin):
         super().__init__()
-        self.handle = None
+
         self.pin = pin
         self.resource = LED(pin)
 
@@ -67,6 +65,7 @@ class LEDResource(resource.Resource):
     async def render_post(self, request):
         payload = request.payload.decode()
         print(f'LED {self.pin}: POST {payload}')
+
         if payload in ['0', 'off']:
             self.resource.off()
         elif payload in ['1', 'on']:
@@ -77,6 +76,7 @@ class LEDResource(resource.Resource):
             p = payload.split(" ")
             if p[0] != 'blink':
                 return Message(code=Code.BAD_REQUEST)
+
             on_time, off_time, n = 1, 1, None
             if len(p) > 1 and p[1].isdigit():
                 on_time = int(p[1])
@@ -84,10 +84,10 @@ class LEDResource(resource.Resource):
                 off_time = int(p[2])
             if len(p) > 3 and p[3].isdigit():
                 n = int(p[3])
+
             self.resource.blink(on_time, off_time, n)
-        else:
-            return Message(code=Code.BAD_REQUEST)
-        return Message(code=Code.CHANGED)
+
+        return Message(code=Code.BAD_REQUEST)
 
 
 class GPIOResource(resource.Resource):
@@ -97,8 +97,6 @@ class GPIOResource(resource.Resource):
 
     def __init__(self, pin):
         super().__init__()
-
-        self.handle = None
 
         self.pin = pin
         self.resource = OutputDevice(pin)
@@ -116,9 +114,8 @@ class GPIOResource(resource.Resource):
             self.resource.off()
         elif payload in ['1', 'on']:
             self.resource.on()
-        else:
-            return Message(code=Code.BAD_REQUEST)
-        return Message(code=Code.CHANGED)
+
+        return Message(code=Code.BAD_REQUEST)
 
 
 class ButtonResource(resource.ObservableResource):
@@ -130,8 +127,6 @@ class ButtonResource(resource.ObservableResource):
 
     def __init__(self, pin, callback_p=None, callback_r=None):
         super().__init__()
-
-        self.handle = None
 
         self.pin = pin
         self.resource = Button(pin)
@@ -170,7 +165,7 @@ class BuzzerResource(resource.Resource):
 
     def __init__(self, pin, active_high=True, initial_value=False):
         super().__init__()
-        self.handle = None
+
         self.pin = pin
         self.resource = Buzzer(pin, active_high=active_high, initial_value=initial_value)
 
@@ -192,6 +187,7 @@ class BuzzerResource(resource.Resource):
             p = payload.split(" ")
             if p[0] != 'beep':
                 return Message(code=Code.BAD_REQUEST)
+
             on_time, off_time, n = 1, 1, None
             if len(p) > 1 and p[1].isdigit():
                 on_time = int(p[1])
@@ -199,10 +195,10 @@ class BuzzerResource(resource.Resource):
                 off_time = int(p[2])
             if len(p) > 3 and p[3].isdigit():
                 n = int(p[3])
+
             self.resource.beep(on_time, off_time, n)
-        else:
-            return Message(code=Code.BAD_REQUEST)
-        return Message(code=Code.CHANGED)
+
+        return Message(code=Code.BAD_REQUEST)
 
 
 def virtual():
@@ -230,7 +226,7 @@ def physical():
     """Run coap resources on real raspberry pi"""
     root = resource.Site()
     root.add_resource(['.well-known', 'core'],
-                        resource.WKCResource(root.get_resources_as_linkheader))
+                      resource.WKCResource(root.get_resources_as_linkheader))
     root.add_resource(['led'], LEDResource(17))
     root.add_resource(['buzzer'], BuzzerResource(22, active_high=False, initial_value=True))
     root.add_resource(['button'], ButtonResource(27, lambda: print("Button pressed")))
@@ -245,7 +241,7 @@ if __name__ == "__main__":
     parser.add_argument('device', metavar='device_type', type=str,
                         help='device', choices=['gpiozero', 'virtual'])
     parser.add_argument('address', nargs='?', metavar='server_address', type=str,
-                        help='CoAP server address', default="0.0.0.0" )
+                        help='CoAP server address', default="0.0.0.0")
 
     args = parser.parse_args()
     SERVER_IP = args.address
