@@ -128,12 +128,12 @@ sudo journalctl -xfu agh-coap-copernicus
 
 ## Phase 3
 
-- [ ] Próba uruchomienia na Raspberry Pi i nagranie @wowu @def-au1t
+- [x] Próba uruchomienia na Raspberry Pi i nagranie @wowu @def-au1t
 - [x] Observable button ~~@rivit98~~ @def-au1t
 - [ ] Przygotować projekt @wowu @def-au1t
    - [ ] Opisujemy scenariusz - sterownik świateł w oparciu o CoAP
-   - [ ] Jest serwer który udostępnia observable button
-   - [ ] Jest klient który zapala diodę po kliknięciu buttona
+   - [x] Jest serwer który udostępnia observable button
+   - [x] Jest klient który zapala diodę po kliknięciu buttona
    - [ ] Małe sprawozdanie @kuczi55
 - [ ] Dokumentacja (uwzględnić m3 i dostosować rozmiary obrazków) @kuczi55
   - [ ] Dopisać o systemd
