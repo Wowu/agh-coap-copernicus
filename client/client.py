@@ -29,7 +29,7 @@ async def main(client):
             elif cmd == 's':
                 await client.set_value(params[0], " ".join(params[1:]))
             elif cmd == 'o':
-                asyncio.ensure_future(client.observe_resource('button1'))
+                asyncio.ensure_future(client.observe_resource(params[0]))
 
         except Exception as e:
             print(e)
@@ -99,7 +99,7 @@ class Client:
         request = Message(
             code=Code.GET,
             uri=f'coap://{self.ip}/{name}',
-            observe=0,
+            observe=0
         )
 
         requester = self.context.request(request)

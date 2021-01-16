@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import asyncio
+
 from aiocoap import *
 
 CONTENT_FORMAT_CBOR = 60

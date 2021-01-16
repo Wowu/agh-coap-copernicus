@@ -1,7 +1,8 @@
 import asyncio
-import aiocoap.resource as resource
-import aiocoap
 import random
+
+import aiocoap
+import aiocoap.resource as resource
 
 
 class TemperatureResource(resource.ObservableResource):
