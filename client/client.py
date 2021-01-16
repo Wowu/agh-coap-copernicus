@@ -2,6 +2,7 @@
 
 import argparse
 import asyncio
+from aioconsole import ainput
 
 from aiocoap import Context, Message, Code
 
@@ -14,7 +15,7 @@ async def main(client):
     print("g name - get resource value")
     print("s name v - set resource value to v")
     while True:
-        user_input = input('')
+        user_input = await ainput('>> ')
         if user_input == 'e':
             print("Goodbye!")
             break
@@ -28,8 +29,7 @@ async def main(client):
             elif cmd == 's':
                 await client.set_value(params[0], " ".join(params[1:]))
             elif cmd == 'o':
-                req = await client.observe_resource('button1')
-                await req.response
+                asyncio.ensure_future(client.observe_resource('button1'))
 
         except Exception as e:
             print(e)
