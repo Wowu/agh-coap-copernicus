@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import logging
 import asyncio
 
 from gpiozero import LED, Button, AngularServo, OutputDevice, Buzzer
@@ -10,9 +9,6 @@ from aiocoap import Code, Context, Message
 from VirtualCopernicusNG import TkCircuit
 from virtual_config import configuration
 
-# logging setup
-logging.basicConfig(level=logging.INFO)
-logging.getLogger("coap-server").setLevel(logging.INFO)
 
 SERVER_IP = '0.0.0.0'
 
@@ -148,6 +144,10 @@ class ButtonResource(resource.ObservableResource):
         if self.callback_p:
             self.callback_p()
 
+    def update_observation_count(self, newcount):
+        super().update_observation_count(newcount)
+        print(f"Button({self.pin}): subscribers num: {newcount}")
+
     def on_released_callback(self):
         self.updated_state()
         if self.callback_r:
@@ -240,7 +240,7 @@ def physical():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run CoAP server')
     parser.add_argument('device', metavar='device_type', type=str,
-                        help='device', choices=['gpiozero', 'virtual'])
+                        help='selects device type', choices=['gpiozero', 'virtual'])
     parser.add_argument('address', nargs='?', metavar='server_address', type=str,
                         help='CoAP server address', default="0.0.0.0")
 
