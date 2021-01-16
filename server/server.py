@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import argparse
 import asyncio
+import signal
+import sys
 
 from gpiozero import LED, Button, AngularServo, OutputDevice, Buzzer
 import aiocoap.resource as resource
@@ -8,7 +10,6 @@ from aiocoap import Code, Context, Message
 
 from VirtualCopernicusNG import TkCircuit
 from virtual_config import configuration
-
 
 SERVER_IP = '0.0.0.0'
 
@@ -86,6 +87,7 @@ class LEDResource(resource.Resource):
             return Message(code=Code.BAD_REQUEST)
         return Message(code=Code.CHANGED)
 
+
 class GPIOResource(resource.Resource):
     def get_link_description(self):
         # Publish additional data in .well-known/core
@@ -112,6 +114,7 @@ class GPIOResource(resource.Resource):
             self.resource.on()
         else:
             return Message(code=Code.BAD_REQUEST)
+
         return Message(code=Code.CHANGED)
 
 
@@ -146,7 +149,7 @@ class ButtonResource(resource.ObservableResource):
 
     def update_observation_count(self, newcount):
         super().update_observation_count(newcount)
-        print(f"Button({self.pin}): subscribers num: {newcount}")
+        print(f"{self}: subscribers num: {newcount}")
 
     def on_released_callback(self):
         self.updated_state()
@@ -154,9 +157,12 @@ class ButtonResource(resource.ObservableResource):
             self.callback_r()
 
     async def render_get(self, request):
-        print(f'BUTTON {self.pin}: GET')
+        print(f'{self}: GET')
         payload = f"{self.resource.value}"
         return Message(payload=payload.encode(), code=Code.CONTENT)
+
+    def __str__(self):
+        return f"BUTTON {self.pin}"
 
 
 class BuzzerResource(resource.Resource):
@@ -200,41 +206,44 @@ class BuzzerResource(resource.Resource):
             self.resource.beep(on_time, off_time, n)
         else:
             return Message(code=Code.BAD_REQUEST)
+
         return Message(code=Code.CHANGED)
+
 
 def virtual():
     """Simulate coap resources in VirtualCopernicus"""
     circuit = TkCircuit(configuration)
 
+    root = resource.Site()
+    root.add_resource(['.well-known', 'core'], resource.WKCResource(root.get_resources_as_linkheader))
+    root.add_resource(['servo'], ServoResource(17))
+    root.add_resource(['led1'], LEDResource(21))
+    root.add_resource(['led2'], LEDResource(22))
+    root.add_resource(['button1'], ButtonResource(11, lambda: print("Button1 pressed")))
+    root.add_resource(['button2'], ButtonResource(12))
+    root.add_resource(['buzzer'], BuzzerResource(16))
+    root.add_resource(['gpio_buzzer'], GPIOResource(15))
+
     @circuit.run
     def main():
-        root = resource.Site()
-        root.add_resource(['.well-known', 'core'],
-                          resource.WKCResource(root.get_resources_as_linkheader))
-        root.add_resource(['servo'], ServoResource(17))
-        root.add_resource(['led1'], LEDResource(21))
-        root.add_resource(['led2'], LEDResource(22))
-        root.add_resource(['button1'], ButtonResource(11, lambda: print("Button1 pressed")))
-        root.add_resource(['button2'], ButtonResource(12))
-        root.add_resource(['buzzer'], BuzzerResource(16))
-        root.add_resource(['gpio_buzzer'], GPIOResource(15))
-        asyncio.set_event_loop(event_loop)
-        asyncio.Task(Context.create_server_context(root, bind=(SERVER_IP, 5683)))
-        event_loop.run_forever()
+        run_server_loop(root)
+
+
+def run_server_loop(site):
+    asyncio.set_event_loop(event_loop)
+    asyncio.Task(Context.create_server_context(site, bind=(SERVER_IP, 5683)))
+    event_loop.run_forever()
 
 
 def physical():
     """Run coap resources on real raspberry pi"""
     root = resource.Site()
-    root.add_resource(['.well-known', 'core'],
-                      resource.WKCResource(root.get_resources_as_linkheader))
+    root.add_resource(['.well-known', 'core'], resource.WKCResource(root.get_resources_as_linkheader))
     root.add_resource(['led'], LEDResource(17))
     root.add_resource(['buzzer'], BuzzerResource(22, active_high=False))
     root.add_resource(['button'], ButtonResource(27, lambda: print("Button pressed")))
 
-    asyncio.set_event_loop(event_loop)
-    asyncio.Task(Context.create_server_context(root, bind=(SERVER_IP, 5683)))
-    event_loop.run_forever()
+    run_server_loop(root)
 
 
 if __name__ == "__main__":
@@ -248,9 +257,10 @@ if __name__ == "__main__":
     SERVER_IP = args.address
     event_loop = asyncio.get_event_loop()
 
+
     # use virtual or gpiozero devices
     if args.device == 'gpiozero':
         physical()
     elif args.device == 'virtual':
+        signal.signal(signal.SIGINT, lambda sig, frame: sys.exit(0)) # "proper" closing of tkinter
         virtual()
-
