@@ -14,6 +14,7 @@ async def main(client):
     print("e - exit")
     print("g name - get resource value")
     print("s name v - set resource value to v")
+    print("o name - observe resource")
     while True:
         user_input = await ainput('>> ')
         if user_input == 'e':
@@ -62,7 +63,7 @@ class Client:
         self.ip = ip
         self.observed_resources = ObservedResources()
         self.context = None
-        self.default_callback = lambda m: print(f'[{m.code}]: {m.payload}')
+        self.default_callback = lambda m: print(f'[{m.code}]: {m.payload.decode("utf-8")}')
         self.default_error_callback = lambda m: print(f'ERROR: {m}')
 
     async def create_client_context(self):
