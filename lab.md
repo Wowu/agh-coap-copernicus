@@ -2,9 +2,11 @@
 
 ## Cel
 
-Celem laboratorium jest zbudowanie sterownika świateł wykorzystującego protokół CoAP. Sterownik składa się z urządzeń pełniących funkcję zarówno serwera jak i klienta. Urządzenia te zawierają zasoby w postaci diod LED oraz przyciski, które można obserwować. Posiadają również adres IP (zakładamy, że wszystkie są w tej samej sieci). Za pomocą włącznika na jednym urządzeniu jesteśmy w stanie kontrlować diodę LED znajdującą się na innym urządzeniu.
+Celem laboratorium jest zbudowanie sterownika świateł wykorzystującego protokół CoAP. Sterownik składa się z urządzeń pełniących funkcję zarówno serwera jak i klienta. Każdy z nich posiada adres IP (zakładamy, że wszystkie są w tej samej sieci). Za pomocą włącznika na jednym urządzeniu jesteśmy w stanie kontrlować diodę LED znajdującą się na innym urządzeniu.
 
 Projekt jest zrealizowany za pomocą serwera zasobów CoAP stworzonego w ramach projektu.
+
+Urządzenia zawierają zasob CoAP'a w postaci diod LED oraz przycisków, które można obserwować. Każde urządzenie w celu zmiany stanu swoich diod obserwuje i nasłuchuje na zmiany zasobów typu przycisk na innych urządzeniach.
 
 ## Organizacja pomieszczeń
 
@@ -14,7 +16,7 @@ Jest analogiczna do tej prezentowanej na zajęciach laboratoryjnych:
 
 ## Realizacja w kodzie
 
-W każdym z urządzeń znajduje się następująca funkcja, wysyłająca request do serwera o adresie przekazanym w argumencie "ip":
+W każdym z urządzeń znajduje się następująca funkcja, wysyłająca request do serwera o adresie przekazanym w argumencie `ip`:
 
 ```python
 async def observe_button(ip, name, callback):
@@ -34,9 +36,9 @@ async def observe_button(ip, name, callback):
             callback()
 ```
 
-Po wywołaniu powyższej funkcji klient przechodzi w stan nasłuchiwania (async for).
+Po wywołaniu powyższej funkcji klient przechodzi w stan nasłuchiwania (`async for`).
 
-Reakcję na odpowiednie zdarzenie możemy przypisać następujący sposób (na przykładzie kitchen.py):
+Reakcję na odpowiednie zdarzenie możemy przypisać następujący sposób (na przykładzie `kitchen.py`):
 
 ```python
 root.add_resource(['button1'], ButtonResource(11, lambda: led1.resource.toggle(), loop=event_loop))
