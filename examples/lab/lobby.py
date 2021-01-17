@@ -6,9 +6,9 @@ import sys
 
 import aiocoap.resource as resource
 from aiocoap import Code, Context, Message
-from resources import LEDResource, ButtonResource, BuzzerResource
 
 from VirtualCopernicusNG import TkCircuit
+from resources import LEDResource, ButtonResource
 from virtual_config import configuration
 
 SERVER_IP = '0.0.0.0'

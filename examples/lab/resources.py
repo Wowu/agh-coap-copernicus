@@ -1,7 +1,9 @@
+import asyncio
+
 import aiocoap.resource as resource
 from aiocoap import Code, Message
 from gpiozero import LED, Button, AngularServo, OutputDevice, Buzzer
-import asyncio
+
 
 class ServoResource(resource.Resource):
     def get_link_description(self):
