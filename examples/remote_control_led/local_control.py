@@ -1,7 +1,8 @@
-from gpiozero import Button
-from aiocoap import Context, Message, Code
-from time import sleep
 import asyncio
+from time import sleep
+
+from aiocoap import Context, Message, Code
+from gpiozero import Button
 
 SERVER_IP = "172.16.0.111"
 

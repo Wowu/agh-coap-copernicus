@@ -8,4 +8,4 @@ Pillow==8.0.1
 pycparser==2.20
 scipy==1.6.0rc2
 sounddevice==0.4.1
-
+aioconsole==0.3.1

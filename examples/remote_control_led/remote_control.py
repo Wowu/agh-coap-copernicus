@@ -1,6 +1,8 @@
 import asyncio
+
 import aiocoap
 from aiocoap import Context, Message, Code
+
 
 @asyncio.coroutine
 def start_server():
