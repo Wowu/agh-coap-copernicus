@@ -8,7 +8,7 @@ Projekt jest zrealizowany za pomocą serwera zasobów CoAP stworzonego w ramach 
 
 ## Organizacja pomieszczeń
 
-Jest analagiczna do tej prezentowanej na zajęciach laboratoryjnych:
+Jest analogiczna do tej prezentowanej na zajęciach laboratoryjnych:
 
 ![](examples/lab/img/organization.png)
 
@@ -51,16 +51,16 @@ tasks.append(asyncio.ensure_future(observe_button('127.0.0.5', 'button2', lambda
 event_loop.run_forever()
 ```
 
-Dzięki powyższemu zapisowi sprawimy, że po wciśnięciu przycisku 'shutter', znajdującemu się na adresie 127.0.0.3 (reprezentującego lobby) zgasimy światło znajdujące się na obecnym urządzeniu (reprezentującego kuchnię), a po wciśnięciu przycisku 'button2' znajdującego się na obecnym urządzeniu, na adres 127.0.0.5 (reprezentującego salon) zostanie wysłany request o zmianę stanu światła. Cały kod wraz z gotowymi skryptami uruchamiającymi (zarówno na systemach z rodziny Windows jak i Linux) znajdują się w katalogu examples/lab.
+Dzięki powyższemu zapisowi sprawimy, że po wciśnięciu przycisku 'shutter', znajdującemu się na adresie 127.0.0.3 (reprezentującego lobby) zgasimy światło znajdujące się na obecnym urządzeniu (reprezentującym kuchnię), a po wciśnięciu przycisku 'button2' znajdującego się na obecnym urządzeniu, na adres 127.0.0.5 (reprezentujący salon) zostanie wysłany request o zmianę stanu światła. Cały kod wraz z gotowymi skryptami uruchamiającymi (zarówno na systemach z rodziny Windows jak i Linux) znajdują się w katalogu examples/lab.
 
 
 ## Przykład uruchomienia
 
-Po uruchomieniu skryptu ukaże nam sie pięć okienek reprezentujących pięć urządzeń oraz konsola:
+Po uruchomieniu skryptu ukaże nam się pięć okienek reprezentujących pięć urządzeń oraz konsola:
 
 ![](examples/lab/img/run.png)
 
-Jak widać na powyższym zrzucie, na konsoli dostajemy informacje o ilości subskrybentów.
+Jak widać na powyższym zrzucie, w konsoli dostajemy informacje o ilości subskrybentów.
 Odpowiednimi przyciskami możemy odpowiednio zapalać i gasić światła w pomieszczeniach zgodnie z zaprezentowanym wcześniej schematem (np. jeden z przycisków w kuchni steruje światłem w kuchni, a drugi w salonie. Jednym z przycisków znajdujących się w salonie jesteśmy w stanie zgasić światła w całym domu).
 
 ![](examples/lab/img/turned_on.png)
