@@ -110,3 +110,6 @@ View logs:
 ```bash
 sudo journalctl -xfu agh-coap-copernicus
 ```
+
+## Project docs:
+[Link](dokumentacja.pdf)
